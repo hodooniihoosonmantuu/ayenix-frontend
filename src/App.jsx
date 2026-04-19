@@ -100,6 +100,21 @@ export default function App() {
   }, [darkMode]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(`${apiBaseUrl}/api/health`, {
+      method: "GET",
+      signal: controller.signal,
+    }).catch(() => {
+      // Best-effort warmup request for cold starts.
+    });
+
+    return () => {
+      controller.abort();
+    };
+  }, [apiBaseUrl]);
+
+  useEffect(() => {
     return () => {
       stopCapture({ closeSocket: true }).catch(() => {});
     };
